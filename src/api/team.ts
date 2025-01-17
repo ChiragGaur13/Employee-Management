@@ -11,19 +11,19 @@ export function teamMembers(): TeamMember[] {
 }
 
 export function addMember(member: TeamMember) {
-  const members = teamMembers(); // Get the current team members
-  members.push(member); // Add the new member to the array
-  saveMembers(members); // Save the updated list back to localStorage
+  const members = teamMembers(); 
+  members.push(member); 
+  saveMembers(members); 
 }
 
 
 export function deleteMember(id: number) {
-  const members = teamMembers(); // Get the current team members
-  const updatedMembers = members.filter((member) => member.id !== id); // Remove the member with the matching ID
-  saveMembers(updatedMembers); // Save the updated list back to localStorage
+  const members = teamMembers(); 
+  const updatedMembers = members.filter((member) => member.id !== id); 
+  saveMembers(updatedMembers); 
 }
 
-// Utility function to save members back to localStorage
+
 function saveMembers(members: TeamMember[]) {
   localStorage.setItem('teamMembers', JSON.stringify(members));
   

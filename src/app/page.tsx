@@ -27,7 +27,6 @@ export default function HomePage() {
       const updatedMembers = [...members, newMemberWithId];
       setMembers(updatedMembers);
 
-      // Save to localStorage
       localStorage.setItem('teamMembers', JSON.stringify(updatedMembers));
 
       setNewMember({ name: '', role: '', bio: '' });
@@ -37,8 +36,12 @@ export default function HomePage() {
   };
 
   const handleDeleteMember = (id: number) => {
-    setMembers((prevMembers) => prevMembers.filter((member) => member.id !== id));
+    const updatedMembers = members.filter((member) => member.id !== id);
+    setMembers(updatedMembers);
+  
+    localStorage.setItem('teamMembers', JSON.stringify(updatedMembers));
   };
+  
 
   const handleEditMember = (id: number) => {
     const memberToEdit = members.find((m) => m.id === id);
@@ -49,14 +52,17 @@ export default function HomePage() {
 
   const handleSaveEdit = () => {
     if (editingMember) {
-      setMembers((prevMembers) =>
-        prevMembers.map((m) =>
-          m.id === editingMember.id ? editingMember : m
-        )
+      const updatedMembers = members.map((m) =>
+        m.id === editingMember.id ? editingMember : m
       );
-      setEditingMember(null); // Close the modal
+      setMembers(updatedMembers);
+  
+      localStorage.setItem('teamMembers', JSON.stringify(updatedMembers));
+  
+      setEditingMember(null); 
     }
   };
+  
 
   const handleSelectMember = (id: number) => {
     router.push(`/task/${id}`);
