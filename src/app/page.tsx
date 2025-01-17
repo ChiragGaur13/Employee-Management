@@ -1,101 +1,200 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import { teamMembers, TeamMember } from '@/api/team';
+import { useRouter } from 'next/navigation';
+
+export default function HomePage() {
+  const [members, setMembers] = useState<TeamMember[]>(teamMembers);
+  const [search, setSearch] = useState('');
+  const [newMember, setNewMember] = useState({
+    name: '',
+    role: '',
+    bio: '',
+  });
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const router = useRouter();
+
+  const filteredMembers = members.filter(
+    (member) =>
+      member.name.toLowerCase().includes(search.toLowerCase()) ||
+      member.role.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleAddMember = () => {
+    if (newMember.name && newMember.role && newMember.bio) {
+      const newMemberWithId = { id: Date.now(), ...newMember };
+      const updatedMembers = [...members, newMemberWithId];
+      setMembers(updatedMembers);
+
+      // Save to localStorage
+      localStorage.setItem('teamMembers', JSON.stringify(updatedMembers));
+
+      setNewMember({ name: '', role: '', bio: '' });
+    } else {
+      alert('Please fill out all fields before adding a member.');
+    }
+  };
+
+  const handleDeleteMember = (id: number) => {
+    setMembers((prevMembers) => prevMembers.filter((member) => member.id !== id));
+  };
+
+  const handleEditMember = (id: number) => {
+    const memberToEdit = members.find((m) => m.id === id);
+    if (memberToEdit) {
+      setEditingMember(memberToEdit);
+    }
+  };
+
+  const handleSaveEdit = () => {
+    if (editingMember) {
+      setMembers((prevMembers) =>
+        prevMembers.map((m) =>
+          m.id === editingMember.id ? editingMember : m
+        )
+      );
+      setEditingMember(null); // Close the modal
+    }
+  };
+
+  const handleSelectMember = (id: number) => {
+    router.push(`/task/${id}`);
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <main className="bg-gray-50 min-h-screen">
+      <header className="bg-gradient-to-r from-blue-600 to-green-500 text-white p-4 shadow-md">
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Keen&Able</h1>
+          <div className="flex items-center gap-2">
+            <label htmlFor="search" className="text-lg font-medium">Search:</label>
+            <input
+              id="search"
+              type="text"
+              placeholder="Search by name or role"
+              className="border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </header>
+
+      <div className="container mx-auto p-6">
+        <section className="bg-white shadow-md rounded-lg p-6 mb-8">
+          <h2 className="text-2xl font-bold mb-4">Add New Employee</h2>
+          <div className="flex flex-wrap gap-4">
+            <input
+              type="text"
+              placeholder="Name"
+              className="border rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-green-300"
+              value={newMember.name}
+              onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Role"
+              className="border rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-green-300"
+              value={newMember.role}
+              onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Bio"
+              className="border rounded-lg px-4 py-2 flex-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+              value={newMember.bio}
+              onChange={(e) => setNewMember({ ...newMember, bio: e.target.value })}
+            />
+            <button
+              className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
+              onClick={handleAddMember}
+            >
+              Add
+            </button>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold mb-4">Team Members</h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMembers.map((member) => (
+              <li
+                key={member.id}
+                className="bg-white shadow-md rounded-lg p-4 hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSelectMember(member.id)}
+              >
+                <h3 className="text-lg font-bold text-blue-600">{member.name}</h3>
+                <p className="text-gray-700">{member.role}</p>
+                <p className="text-gray-500 mt-2">{member.bio}</p>
+                <div className="flex justify-between items-center mt-4">
+                  <button
+                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditMember(member.id);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteMember(member.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {editingMember && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+              <h2 className="text-xl font-bold mb-4">Edit Member</h2>
+              <input
+                type="text"
+                className="border rounded-lg px-4 py-2 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                value={editingMember.name}
+                onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
+                placeholder="Name"
+              />
+              <input
+                type="text"
+                className="border rounded-lg px-4 py-2 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                value={editingMember.role}
+                onChange={(e) => setEditingMember({ ...editingMember, role: e.target.value })}
+                placeholder="Role"
+              />
+              <input
+                type="text"
+                className="border rounded-lg px-4 py-2 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                value={editingMember.bio}
+                onChange={(e) => setEditingMember({ ...editingMember, bio: e.target.value })}
+                placeholder="Bio"
+              />
+              <div className="flex justify-between">
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                  onClick={handleSaveEdit}
+                >
+                  Save
+                </button>
+                <button
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                  onClick={() => setEditingMember(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
