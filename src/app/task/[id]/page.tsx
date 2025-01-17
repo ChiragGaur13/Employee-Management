@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { teamMembers } from '@/api/team';
-import { TeamMember } from '@/api/team';
 
 type Task = {
   id: number;
