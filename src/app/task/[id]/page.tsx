@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { teamMembers } from '@/api/team';
+import { useParams } from 'next/navigation'; // Import useParams from Next.js
 
 type Task = {
   id: number;
@@ -9,7 +10,8 @@ type Task = {
   status: 'To Do' | 'In Progress' | 'Completed';
 };
 
-export default function TaskManagementPage({ params }: { params: { id: string } }) {
+export default function TaskManagementPage() {
+  const { id } = useParams(); // Unwrap the params using useParams
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState({
     title: '',
@@ -19,7 +21,8 @@ export default function TaskManagementPage({ params }: { params: { id: string } 
   const [editTaskId, setEditTaskId] = useState<number | null>(null);
   const [employeeName, setEmployeeName] = useState<string | null>(null);
 
-  const employeeId = params?.id ? parseInt(params.id, 10) : null;
+  // Type guard to ensure `id` is a string, not an array
+  const employeeId = typeof id === 'string' ? parseInt(id, 10) : null;
 
   useEffect(() => {
     if (employeeId) {
