@@ -26,9 +26,7 @@ export default function HomePage() {
       const newMemberWithId = { id: Date.now(), ...newMember };
       const updatedMembers = [...members, newMemberWithId];
       setMembers(updatedMembers);
-
       localStorage.setItem('teamMembers', JSON.stringify(updatedMembers));
-
       setNewMember({ name: '', role: '', bio: '' });
     } else {
       alert('Please fill out all fields before adding a member.');
@@ -38,7 +36,6 @@ export default function HomePage() {
   const handleDeleteMember = (id: number) => {
     const updatedMembers = members.filter((member) => member.id !== id);
     setMembers(updatedMembers);
-  
     localStorage.setItem('teamMembers', JSON.stringify(updatedMembers));
   };
   

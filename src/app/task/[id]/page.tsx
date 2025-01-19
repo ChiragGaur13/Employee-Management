@@ -20,8 +20,6 @@ export default function TaskManagementPage() {
   });
   const [editTaskId, setEditTaskId] = useState<number | null>(null);
   const [employeeName, setEmployeeName] = useState<string | null>(null);
-
-  // Type guard to ensure `id` is a string, not an array
   const employeeId = typeof id === 'string' ? parseInt(id, 10) : null;
 
   useEffect(() => {
@@ -29,7 +27,6 @@ export default function TaskManagementPage() {
       const employees = teamMembers();
       const employee = employees.find((emp) => emp.id === employeeId);
       setEmployeeName(employee ? employee.name : null);
-
       const storedTasks = localStorage.getItem(`tasks_${employeeId}`);
       if (storedTasks) {
         setTasks(JSON.parse(storedTasks));
@@ -46,7 +43,6 @@ export default function TaskManagementPage() {
       alert('Please provide both a title and a description for the task.');
       return;
     }
-
     const newTaskToAdd = { id: Date.now(), ...newTask };
     const updatedTasks = [...tasks, newTaskToAdd];
     setTasks(updatedTasks);
